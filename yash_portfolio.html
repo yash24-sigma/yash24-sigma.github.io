@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yash | Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0a0f;
+    --surface:#111118;
+    --surface2:#1a1a24;
+    --border:#2a2a3a;
+    --accent:#00d4ff;
+    --accent2:#7c3aed;
+    --text:#e8e8f0;
+    --muted:#6b6b8a;
+    --green:#00ff88;
+    --font-mono:'JetBrains Mono',monospace;
+    --font-sans:'Syne',sans-serif;
+  }
+  body{background:var(--bg);color:var(--text);font-family:var(--font-sans);min-height:100vh;overflow-x:hidden}
+  
+  /* canvas bg */
+  #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.4}
+  .content{position:relative;z-index:1}
+
+  /* nav */
+  nav{display:flex;justify-content:space-between;align-items:center;padding:1.25rem 3rem;border-bottom:1px solid var(--border);background:rgba(10,10,15,0.8);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100}
+  .nav-logo{font-family:var(--font-mono);font-size:14px;color:var(--accent);letter-spacing:0.05em}
+  .nav-logo span{color:var(--muted)}
+  .nav-links{display:flex;gap:2rem}
+  .nav-links a{font-family:var(--font-mono);font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.2s}
+  .nav-links a:hover{color:var(--accent)}
+  .nav-status{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--green)}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+  /* hero */
+  .hero{padding:5rem 3rem 4rem;max-width:900px}
+  .hero-tag{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.15em;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px}
+  .hero-tag::before{content:'';width:24px;height:1px;background:var(--accent)}
+  .hero h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:700;line-height:1.1;margin-bottom:1rem;letter-spacing:-0.02em}
+  .hero h1 .name{color:var(--text)}
+  .hero h1 .role{color:var(--accent)}
+  .hero-desc{font-family:var(--font-mono);font-size:13px;color:var(--muted);line-height:1.8;max-width:580px;margin-bottom:2.5rem}
+  .hero-desc .highlight{color:var(--text)}
+  .hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+  .btn-primary{background:var(--accent);color:#000;padding:0.7rem 1.5rem;border:none;font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:0.08em;cursor:pointer;border-radius:4px;transition:all 0.2s}
+  .btn-primary:hover{background:#fff;transform:translateY(-1px)}
+  .btn-outline{background:transparent;color:var(--accent);padding:0.7rem 1.5rem;border:1px solid var(--accent);font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:0.08em;cursor:pointer;border-radius:4px;transition:all 0.2s}
+  .btn-outline:hover{background:rgba(0,212,255,0.08)}
+
+  /* terminal block */
+  .terminal{margin:0 3rem 4rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:600px}
+  .terminal-bar{background:var(--surface2);padding:0.6rem 1rem;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+  .t-dot{width:10px;height:10px;border-radius:50%}
+  .t-dot.r{background:#ff5f57}.t-dot.y{background:#febc2e}.t-dot.g{background:#28c840}
+  .terminal-title{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-left:auto;margin-right:auto}
+  .terminal-body{padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:12px;line-height:2}
+  .t-line{display:flex;gap:8px}
+  .t-prompt{color:var(--accent2)}
+  .t-cmd{color:var(--text)}
+  .t-out{color:var(--muted)}
+  .t-green{color:var(--green)}
+  .t-blue{color:var(--accent)}
+  .t-cursor{display:inline-block;width:8px;height:14px;background:var(--accent);animation:blink 1s infinite;vertical-align:middle;margin-left:2px}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* sections */
+  section{padding:3rem;border-top:1px solid var(--border)}
+  .section-label{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.15em;margin-bottom:2rem;display:flex;align-items:center;gap:12px}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  /* skills grid */
+  .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+  .skill-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;transition:border-color 0.2s,transform 0.2s}
+  .skill-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .skill-category{font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:0.1em;margin-bottom:0.75rem}
+  .skill-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:0.5rem}
+  .skill-tags{display:flex;flex-wrap:wrap;gap:4px}
+  .tag{font-family:var(--font-mono);font-size:10px;color:var(--muted);background:var(--surface2);padding:2px 8px;border-radius:3px;border:1px solid var(--border)}
+
+  /* projects */
+  .projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem}
+  .project-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;transition:all 0.2s;cursor:pointer}
+  .project-card:hover{border-color:var(--accent);background:var(--surface2)}
+  .project-card.featured{border-color:var(--accent2)}
+  .project-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem}
+  .project-icon{font-size:20px}
+  .project-badge{font-family:var(--font-mono);font-size:9px;color:var(--accent2);background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);padding:2px 8px;border-radius:3px;letter-spacing:0.08em}
+  .project-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:0.5rem}
+  .project-desc{font-family:var(--font-mono);font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+  .project-stack{display:flex;flex-wrap:wrap;gap:4px}
+  .stack-tag{font-family:var(--font-mono);font-size:10px;color:var(--accent);background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);padding:2px 8px;border-radius:3px}
+
+  /* contact */
+  .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+  .contact-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;transition:all 0.2s}
+  .contact-item:hover{border-color:var(--accent);cursor:pointer}
+  .contact-label{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:0.4rem;letter-spacing:0.08em}
+  .contact-value{font-family:var(--font-mono);font-size:13px;color:var(--accent)}
+
+  /* footer */
+  footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .footer-text{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+  .footer-text span{color:var(--accent)}
+
+  @media(max-width:600px){
+    nav{padding:1rem 1.5rem}
+    .nav-links{display:none}
+    .hero{padding:3rem 1.5rem 2rem}
+    .terminal{margin:0 1.5rem 3rem}
+    section{padding:2rem 1.5rem}
+    footer{padding:1.5rem;flex-direction:column;gap:0.5rem;text-align:center}
+  }
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="content">
+
+<nav>
+  <div class="nav-logo"><span>~/</span>yash-sigma</div>
+  <div class="nav-links">
+    <a href="#skills">skills</a>
+    <a href="#projects">projects</a>
+    <a href="#contact">contact</a>
+  </div>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    open to work
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">BScIT Graduate · Mumbai University · 2026</div>
+  <h1>
+    <div class="name">Yash Monde</div>
+    <div class="role">Developer & Analyst</div>
+  </h1>
+  <p class="hero-desc">
+    I build <span class="highlight">full-stack web applications</span> and turn raw data into <span class="highlight">actionable insights</span>. 
+    From Flask backends with payment APIs to Power BI dashboards — I ship things that work.
+  </p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">View Projects</button>
+    <button class="btn-outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Contact Me</button>
+  </div>
+</div>
+
+<div class="terminal">
+  <div class="terminal-bar">
+    <div class="t-dot r"></div>
+    <div class="t-dot y"></div>
+    <div class="t-dot g"></div>
+    <div class="terminal-title">yash@portfolio ~ bash</div>
+  </div>
+  <div class="terminal-body">
+    <div class="t-line"><span class="t-prompt">→</span><span class="t-cmd">whoami</span></div>
+    <div class="t-line"><span class="t-green">yash · fresher · builder · problem-solver</span></div>
+    <div class="t-line" style="margin-top:4px"><span class="t-prompt">→</span><span class="t-cmd">cat skills.txt</span></div>
+    <div class="t-line"><span class="t-out">Python · Flask · SQL · Power BI · Excel · HTML/CSS/JS</span></div>
+    <div class="t-line" style="margin-top:4px"><span class="t-prompt">→</span><span class="t-cmd">git log --oneline</span></div>
+    <div class="t-line"><span class="t-blue">a3f9c12</span><span class="t-out"> · Turf Booking System — Flask + Stripe API</span></div>
+    <div class="t-line"><span class="t-blue">7b2d891</span><span class="t-out"> · Sales Dashboard — Power BI + Python</span></div>
+    <div class="t-line" style="margin-top:4px"><span class="t-prompt">→</span><span class="t-cursor"></span></div>
+  </div>
+</div>
+
+<section id="skills">
+  <div class="section-label">// tech stack</div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-category">BACKEND</div>
+      <div class="skill-name">Python & Flask</div>
+      <div class="skill-tags">
+        <span class="tag">Flask</span><span class="tag">SQLite</span><span class="tag">REST APIs</span><span class="tag">Stripe</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-category">FRONTEND</div>
+      <div class="skill-name">Web Dev</div>
+      <div class="skill-tags">
+        <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-category">DATA & BI</div>
+      <div class="skill-name">Analytics</div>
+      <div class="skill-tags">
+        <span class="tag">Power BI</span><span class="tag">Excel</span><span class="tag">Pandas</span><span class="tag">SQL</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-category">TOOLS</div>
+      <div class="skill-name">Dev Tools</div>
+      <div class="skill-tags">
+        <span class="tag">Git</span><span class="tag">GitHub</span><span class="tag">VS Code</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-label">// projects</div>
+  <div class="projects-grid">
+    <div class="project-card featured">
+      <div class="project-header">
+        <span class="project-icon">⚡</span>
+        <span class="project-badge">FEATURED</span>
+      </div>
+      <div class="project-title">Turf Playground Booking System</div>
+      <div class="project-desc">Full-stack booking platform with real-time slot availability, user authentication, and live payment processing via Stripe API.</div>
+      <div class="project-stack">
+        <span class="stack-tag">Python</span>
+        <span class="stack-tag">Flask</span>
+        <span class="stack-tag">SQLite</span>
+        <span class="stack-tag">Stripe API</span>
+        <span class="stack-tag">SMTP</span>
+        <span class="stack-tag">HTML/CSS/JS</span>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-icon">📊</span>
+      </div>
+      <div class="project-title">Sales Performance Dashboard</div>
+      <div class="project-desc">Interactive BI dashboard analyzing regional sales trends, KPIs, and performance gaps using cleaned data from Python Pandas.</div>
+      <div class="project-stack">
+        <span class="stack-tag">Power BI</span>
+        <span class="stack-tag">Python</span>
+        <span class="stack-tag">Pandas</span>
+        <span class="stack-tag">Excel</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-label">// contact</div>
+  <div class="contact-grid">
+    <div class="contact-item">
+      <div class="contact-label">EMAIL</div>
+      <div class="contact-value">realyashmonde956@gmail.com</div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-label">GITHUB</div>
+      <div class="contact-value">github.com/yash24-sigma</div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-label">LINKEDIN</div>
+      <div class="contact-value">linkedin.com/in/yashmonde</div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-label">LOCATION</div>
+      <div class="contact-value">Mumbai,India</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-text">Built with <span>curiosity</span> · Mumbai, 2026</div>
+  <div class="footer-text">yash24-sigma · <span>open to opportunities</span></div>
+</footer>
+
+</div>
+
+<script>
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();
+window.addEventListener('resize', resize);
+
+for(let i=0;i<60;i++){
+  particles.push({
+    x:Math.random()*1200,
+    y:Math.random()*800,
+    vx:(Math.random()-0.5)*0.3,
+    vy:(Math.random()-0.5)*0.3,
+    size:Math.random()*1.5+0.5,
+    opacity:Math.random()*0.5+0.1
+  });
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,212,255,${p.opacity})`;
+    ctx.fill();
+  });
+  particles.forEach((a,i)=>{
+    particles.slice(i+1).forEach(b=>{
+      const dx=a.x-b.x, dy=a.y-b.y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<120){
+        ctx.beginPath();
+        ctx.moveTo(a.x,a.y);
+        ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=`rgba(0,212,255,${0.06*(1-d/120)})`;
+        ctx.lineWidth=0.5;
+        ctx.stroke();
+      }
+    });
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
